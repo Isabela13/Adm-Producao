@@ -45,47 +45,42 @@ public class process {
     	int processos[]= new int[linhasDoArquivo.size()];
     	SimpleDateFormat sdf = new SimpleDateFormat("mm:ss.SSS");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-    
-        for(int i = 0; i< linhasDoArquivo.size(); i++){
-        	
+        for(int a = 0; a< linhasDoArquivo.size(); a++){
+        	 Date time = sdf.parse(linhasDoArquivo.get(a));
+        	 Date timiMiliS = time;
+        	 SimpleDateFormat formatador = new SimpleDateFormat("mmssSSS");           
+        	 int dataAtual =  Integer.parseInt(formatador.format(timiMiliS));
+        	 processos[a]=dataAtual;
         }
-        
-        Date date = sdf.parse(linhasDoArquivo.get(0));
-        
-        System.out.println("in milliseconds: " + date.getTime());     
-         
-        
-        
-    	
-		
+        //Arquivo de saida com o tempo gasto na fila
+        Formatter saida = new Formatter("/home/grad/si/16/imsp/workspace/ADM-PROD/src/out.txt");
+       
     	//Criei essa variavel para altermos de forma mais facil o tempo de abertura do programa
-    	double tempoAbertura =  (0.1);  // para esse tempo o processador nao vai ficar ocioso
+    	int tempoAbertura =  1;  // EM MILISEGUNDOS //para esse tempo o processador nao vai ficar ocioso ## 0.5 milisegundos fica ocioso
     	
     	// Preenchimento do vetor com o tempo de abertura do programa 
-    	double arrayTempoAbertura[] = new double[linhasDoArquivo.size()];
+    	int  arrayTempoAbertura[] = new int[linhasDoArquivo.size()];
     	
-		//A primeira posicao sera 1. Ja que sera o primeiro que sera aberto
+		//A primeira posicao sera 0. Ja que sera o primeiro que sera aberto
     	arrayTempoAbertura[0] = 0;
     	for (int i = 1; i<linhasDoArquivo.size() ; i++){
     		arrayTempoAbertura[i] =  arrayTempoAbertura[i-1] + tempoAbertura;
     	}
     	
-    	double tempoGastoFila[] = new double[linhasDoArquivo.size()];
+    	int tempoTotalFila[] = new int[linhasDoArquivo.size()];
     	
-    	
-    	
-    	
-    	for(int i=1; i<linhasDoArquivo.size() ; i++){
-    		int tempoOcioso = 0;
+    	int tempoOcioso = 0;
+    	for(int i=0; i<linhasDoArquivo.size() ; i++){
     		if(arrayTempoAbertura[i]<tempoOcioso){
-    			tempoGastoFila[i]=tempoOcioso-arrayTempoAbertura[i];
-    			/*tempoOcioso=tempoOcioso + Integer.parseInt(String.valueOf(linhasDoArquivo.get(i)));//essa conversao noa ta dando certo!!
-*/    			
+    			tempoTotalFila[i]=tempoOcioso-arrayTempoAbertura[i];
+    			tempoOcioso += processos[i];
+    		}else{
+    			tempoTotalFila[i]=0;
+    			tempoOcioso=tempoOcioso+arrayTempoAbertura[i]+processos[i];
     		}
+    		 saida.format(""+tempoTotalFila[i]+"\n");
+   
     	}
-    	
-    	
-    	/*System.out.println(linhasDoArquivo.get(i));*/
-    	
+    	 saida.close();
     }
 }
