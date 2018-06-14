@@ -1,37 +1,55 @@
 import java.io.*;   
 import java.util.*;   
-import javax.swing.*;   
+  
 
 public class process {   
-    private static String nome;   
-    private static String [] sai; 
-    static RandomAccessFile objeto;
-    // O contrutor deve ter o mesmo nome da Classe   
-    public static  void Ler(String nomeArquivo){    
-        nome = nomeArquivo;   
-    }   
-    // método que retorna o vetor contendo as informações do arquivo  
-    public static String[] criarVetor() {
-        try {
-            File arq = new File(nome);   
-            objeto = new RandomAccessFile(arq , "rw");
-            System.out.println(objeto.length());
-            sai = new String[(int)objeto.length()]; // inicializa o vetor com o tamanho do arquivo
-            for (int i = 0; i < objeto.length(); i++) {
-                sai[i]= objeto.readLine();
-            }  
-            return sai;
-        } catch (FileNotFoundException ex) { // trata as exceções do tipo FileNotFoundException 
-            ex.printStackTrace();
-        } catch (IOException ex) { // trata as exceções do tipo IOException 
-            ex.printStackTrace();
-        }     
-        return null; // só retorna null se der algum erro
-    }
+	
+	public static ArrayList<String> getLinhasArquivo( File file ) throws FileNotFoundException, IOException{
+	    ArrayList<String> linhas;
+	        
+	    try (BufferedReader leitor = new BufferedReader( new FileReader(file) )) {
+	       linhas = new ArrayList<>();
+	       String linha = "";
+	            
+	       while( (linha = leitor.readLine()) != null ){
+	          if( linha.length() > 0 )
+	              linhas.add(linha);
+	       }
+	    }
+	    return linhas;
+	}
+	
     
-    public static void main(String[] args) {
-    	Ler("arch1.txt");
-    	criarVetor();
-    	System.out.println("OI");
+	public static void main(String[] args) throws IOException {
+    	//Leitura do arquivo e armazenamento em um ArrayList
+    	String local = "/home/grad/si/16/imsp/ADM-Prod/arch1.txt"; //preciso de ajuda para mudar issssssso 
+    	ArrayList<String> linhasDoArquivo = getLinhasArquivo(new File (local));
+    	
+    	//Criei essa variavel para altermos de forma mais facil o tempo de abertura do programa
+    	double tempoAbertura =  (0.1);  // para esse tempo o processador nao vai ficar ocioso
+    	
+    	// Preenchimento do vetor com o tempo de abertura do programa 
+    	double arrayTempoAbertura[] = new double[linhasDoArquivo.size()];
+    	
+		//A primeira posicao sera 1. Ja que sera o primeiro que sera aberto
+    	arrayTempoAbertura[0] = 0;
+    	for (int i = 1; i<linhasDoArquivo.size() ; i++){
+    		arrayTempoAbertura[i] =  arrayTempoAbertura[i-1] + tempoAbertura;
+    	}
+    	
+    	double tempoGastoFila[] = new double[linhasDoArquivo.size()];
+    	
+    	for(int i=1; i<linhasDoArquivo.size() ; i++){
+    		int tempoOcioso = 0;
+    		if(arrayTempoAbertura[i]<tempoOcioso){
+    			tempoGastoFila[i]=tempoOcioso-arrayTempoAbertura[i];
+    			tempoOcioso=tempoOcioso + Integer.parseInt(String.valueOf(linhasDoArquivo.get(i)));//essa conversao noa ta dando certo!!
+    			
+    		}
+    	}
+    	
+    	
+    	/*System.out.println(linhasDoArquivo.get(i));*/
+    	
     }
 }
